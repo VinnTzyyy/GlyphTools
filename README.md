@@ -1,2 +1,2 @@
 # GlyphTools
-minecraft bedrock glyph tools
+Minecraft Bedrock Glyph Tools
