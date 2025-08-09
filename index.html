@@ -17,6 +17,7 @@
       --tile-bg: #333;
       --tile-hover-bg: #555;
       --outline-color: white;
+      --footer-bg: #1e1e1e;
     }
 
     body.light {
@@ -26,6 +27,7 @@
       --tile-bg: #ccc;
       --tile-hover-bg: #aaa;
       --outline-color: black;
+      --footer-bg: rgba(200, 200, 200, 0.3);
     }
 
     body {
@@ -35,23 +37,35 @@
       background-color: var(--bg-color);
       color: var(--text-color);
       transition: background 0.3s, color 0.3s;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
     }
 
     .top-bar {
       display: flex;
       align-items: center;
-      background: linear-gradient(135deg, #7f00ff, #00bfff);
+      background: linear-gradient(270deg, #7f00ff, #00bfff);
+      background-size: 400% 400%;
+      animation: gradientShift 6s ease infinite;
       padding: 12px 24px;
       font-size: 1.6em;
       color: white;
       position: relative;
       gap: 16px;
+      user-select: none;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     .menu-toggle {
       font-size: 1.4em;
       cursor: pointer;
-      user-select: none;
       padding-left: 4px;
     }
 
@@ -103,12 +117,13 @@
     }
 
     .container {
-      max-width: 1100px;
+      max-width: 550px;
       margin: 30px auto;
       padding: 20px;
       background: var(--container-bg);
       border-radius: 12px;
       box-shadow: 0 0 30px rgba(0,0,0,0.5);
+      text-align: center;
     }
 
     .upload-container {
@@ -117,10 +132,8 @@
       padding: 20px;
       border-radius: 12px;
       display: inline-block;
-      text-align: center;
-      position: relative;
-      left: 50%;
-      transform: translateX(-50%);
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .icon-text-group {
@@ -181,25 +194,49 @@
       grid-template-columns: repeat(8, 1fr);
       gap: 8px;
       justify-content: center;
+      max-width: 100%;
     }
 
     .glyph-tile {
-      background: var(--tile-bg);
+      font-size: 46px;
       aspect-ratio: 1 / 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 36px;
+      min-width: 50px;
+      background: var(--tile-bg);
       border-radius: 8px;
-      transition: outline 0.2s ease-in-out;
       cursor: pointer;
       user-select: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: outline 0.2s ease-in-out, transform 0.2s, background 0.3s;
       overflow: hidden;
       position: relative;
     }
 
     .glyph-tile:hover {
       outline: 2px solid var(--outline-color);
+    }
+
+    .glyph-tile.selected {
+      animation: highlightPulse 0.6s ease;
+      background: linear-gradient(135deg, #7f00ff, #00bfff);
+      background-size: 200% 200%;
+      box-shadow: 0 0 12px rgba(127,0,255,0.7);
+    }
+
+    @keyframes highlightPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes outlineFade {
+      0% { outline: 3px solid var(--outline-color); outline-offset: 0px; }
+      100% { outline: 3px solid transparent; outline-offset: 4px; }
+    }
+
+    .glyph-tile.outline-fade {
+      animation: outlineFade 0.6s ease forwards;
     }
 
     .glyph-img {
@@ -223,11 +260,39 @@
       opacity: 0;
       transition: opacity 0.3s ease-in-out;
       pointer-events: none;
+      user-select: none;
+      z-index: 999;
     }
 
     #toast.show {
       opacity: 1;
     }
+
+    #file-info {
+      font-family: sans-serif;
+      background: rgba(180, 180, 180, 0.2);
+      padding: 8px 14px;
+      border-radius: 8px;
+      display: inline-block;
+      margin-bottom: 15px;
+    }
+
+    body.light #file-info {
+      background: rgba(200, 200, 200, 0.3);
+    }
+
+    footer {
+      background: var(--footer-bg);
+      padding: 14px 0;
+      border-radius: 8px 8px 0 0;
+      font-family: sans-serif;
+      font-weight: bold;
+      text-align: center;
+      font-size: 1.1em;
+      user-select: none;
+      margin-top: auto;
+    }
+
   </style>
 </head>
 <body>
@@ -253,17 +318,23 @@
   </div>
 
   <div class="container glyph-container" id="glyph-container" style="display: none;">
+    <div id="file-info"></div>
     <div id="glyph-grid"></div>
   </div>
 
   <div id="toast">Copied!</div>
+
+  <footer id="footer">
+    Bedrock Glyph Tools by VinnCH
+  </footer>
 
   <script>
     const upload = document.getElementById('upload');
     const grid = document.getElementById('glyph-grid');
     const toast = document.getElementById('toast');
     const menu = document.getElementById('menu');
-    let filenameHex = '';
+    const fileInfo = document.getElementById('file-info');
+    const glyphContainer = document.getElementById('glyph-container');
 
     function toggleMenu() {
       menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
@@ -274,12 +345,21 @@
       toggleMenu();
     }
 
+    let selectedTile = null;
+    function selectTile(tile) {
+      if (selectedTile) {
+        selectedTile.classList.remove("selected");
+      }
+      selectedTile = tile;
+      tile.classList.add("selected");
+    }
+
     upload.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
 
       const match = file.name.match(/([0-9a-fA-F]{2})/);
-      filenameHex = match ? match[1].toUpperCase() : 'E1';
+      const filenameHex = match ? match[1].toUpperCase() : 'E1';
 
       const img = new Image();
       img.onload = () => {
@@ -293,7 +373,9 @@
         const tileSizeY = img.height / 16;
         grid.innerHTML = "";
 
-        document.getElementById('glyph-container').style.display = 'block';
+        const fileSizeKB = (file.size / 1024).toFixed(1);
+        fileInfo.textContent = `${file.name} - ${fileSizeKB} KB - ${img.width}×${img.height} px`;
+        glyphContainer.style.display = 'block';
 
         for (let row = 0; row < 16; row++) {
           for (let col = 0; col < 16; col++) {
@@ -317,6 +399,11 @@
             tile.addEventListener('click', () => {
               navigator.clipboard.writeText(glyphChar).then(() => {
                 showToast(`Copied "${glyphChar}"`);
+                selectTile(tile);
+
+                tile.classList.remove("outline-fade");
+                void tile.offsetWidth;
+                tile.classList.add("outline-fade");
               });
             });
 
