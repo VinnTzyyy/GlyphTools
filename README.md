@@ -12,8 +12,5 @@ Didesain khusus untuk pembuat resource pack, addon, atau siapa pun yang ingin be
 - Desain clean dengan font MinecraftTen.
 - Credit **Bedrock Glyph Tools by VinnCH** di bagian bawah.
 
-## 📸 Tampilan
-![Preview](preview.png)  
-*Tampilan setelah upload file glyph.*
-
-## 📂 Struktur
+## 🔥 Coba Sekarang
+- https://vinntzyyy.github.io/GlyphTools/
