@@ -3,296 +3,305 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Glyph Tool</title>
+  <title>MCPE | GlyphTools</title>
   <style>
     @font-face {
       font-family: 'MinecraftTen';
-      src: url('MinecraftTen.ttf') format('truetype');
+      src: url('font/MinecraftTen.ttf') format('truetype');
     }
-
     :root {
-      --bg-color: #1a1a1a;
-      --text-color: white;
-      --container-bg: #222;
-      --tile-bg: #333;
-      --tile-hover-bg: #555;
-      --outline-color: white;
-      --footer-bg: #1e1e1e;
+      --bg-color: #1a1a1a; --text-color: white; --container-bg: #222;
+      --tile-bg: #333; --tile-hover-bg: #555; --outline-color: white;
+      --footer-bg: #1e1e1e; --icon-bg: #3a3a3a; --accent-color: #4e54c8;
     }
-
     body.light {
-      --bg-color: white;
-      --text-color: black;
-      --container-bg: #eee;
-      --tile-bg: #ccc;
-      --tile-hover-bg: #aaa;
-      --outline-color: black;
-      --footer-bg: rgba(200, 200, 200, 0.3);
+      --bg-color: white; --text-color: black; --container-bg: #eee;
+      --tile-bg: #ccc; --tile-hover-bg: #aaa; --outline-color: black;
+      --footer-bg: rgba(200, 200, 200, 0.3); --icon-bg: #d0d0d0;
     }
-
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'MinecraftTen', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      transition: background 0.3s, color 0.3s;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
+      margin: 0; padding: 0; font-family: 'MinecraftTen', sans-serif;
+      background-color: var(--bg-color); color: var(--text-color);
+      transition: background 0.3s, color 0.3s; min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: flex-start;
     }
-
+    .container {
+      width: 95%; max-width: 550px; margin: 20px auto; padding: 20px;
+      background: var(--container-bg); border-radius: 12px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.5); text-align: center; box-sizing: border-box;
+    }
     .top-bar {
-      display: flex;
-      align-items: center;
-      background: linear-gradient(270deg, #7f00ff, #00bfff);
-      background-size: 400% 400%;
-      animation: gradientShift 6s ease infinite;
-      padding: 12px 24px;
-      font-size: 1.6em;
-      color: white;
-      position: relative;
-      gap: 16px;
-      user-select: none;
+      display: flex; align-items: center; background: linear-gradient(270deg, #7f00ff, #00bfff);
+      background-size: 400% 400%; animation: gradientShift 6s ease infinite;
+      padding: 12px 24px; font-size: 1.6em; color: white; position: relative; gap: 16px; user-select: none;
     }
-
-    @keyframes gradientShift {
+    @keyframes gradientShift { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
+    .menu-toggle { font-size: 1.4em; cursor: pointer; padding-left: 4px; }
+    .top-bar-title { padding-top: 6.5px; padding-left: 6.5px; line-height: 1.2; }
+    .menu-dropdown {
+      position: absolute; top: 60px; left: 20px; background: #333; color: white;
+      border-radius: 8px; overflow: hidden; display: none; z-index: 10;
+    }
+    .menu-dropdown button { display: block; width: 100%; background: none; border: none; padding: 10px 16px; text-align: left; font-family: 'MinecraftTen', sans-serif; color: white; cursor: pointer; }
+    .menu-dropdown button:hover { background: #555; }
+    body.light .menu-dropdown { background: #ddd; color: black; }
+    body.light .menu-dropdown button { color: black; }
+    body.light .menu-dropdown button:hover { background: #bbb; }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(0px); }
+    }
+    @keyframes floatShadow {
+      0% { transform: scale(1); opacity: 0.4; }
+      50% { transform: scale(0.85); opacity: 0.25; }
+      100% { transform: scale(1); opacity: 0.4; }
+    }
+    @keyframes bannerGradientShift {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-
-    .menu-toggle {
-      font-size: 1.4em;
-      cursor: pointer;
-      padding-left: 4px;
+    @keyframes toastGradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
-
-    .top-bar-title {
-      padding-top: 6.5px;
-      padding-left: 6.5px;
-      line-height: 1.2;
-    }
-
-    .menu-dropdown {
-      position: absolute;
-      top: 60px;
-      left: 20px;
-      background: #333;
-      color: white;
-      border-radius: 8px;
+    .banner-container {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+      padding: 25px 30px;
+      border: none;
+      background: linear-gradient(135deg, #00d2ff, #3a7bd5, #00c6ff, #0072ff);
+      background-size: 300% 300%;
+      animation: bannerGradientShift 15s ease infinite;
       overflow: hidden;
-      display: none;
-      z-index: 10;
     }
-
-    .menu-dropdown button {
-      display: block;
-      width: 100%;
-      background: none;
-      border: none;
-      padding: 10px 16px;
-      text-align: left;
-      font-family: 'MinecraftTen', sans-serif;
-      color: white;
-      cursor: pointer;
-    }
-
-    .menu-dropdown button:hover {
-      background: #555;
-    }
-
-    body.light .menu-dropdown {
-      background: #ddd;
-      color: black;
-    }
-
-    body.light .menu-dropdown button {
-      color: black;
-    }
-
-    body.light .menu-dropdown button:hover {
-      background: #bbb;
-    }
-
-    .container {
-      max-width: 550px;
-      margin: 30px auto;
-      padding: 20px;
-      background: var(--container-bg);
-      border-radius: 12px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.5);
-      text-align: center;
-    }
-
-    .upload-container {
-      margin-bottom: 20px;
-      background: var(--container-bg);
-      padding: 20px;
-      border-radius: 12px;
-      display: inline-block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .icon-text-group {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      margin-bottom: 20px;
-      justify-content: center;
-      text-align: left;
-    }
-
-    .icon-text-group img {
-      width: 48px;
-      height: 48px;
-      object-fit: contain;
-    }
-
-    .icon-text-lines {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 4px;
-    }
-
-    .icon-text-lines div:first-child {
-      font-size: 1.2em;
-    }
-
-    .icon-text-lines div:last-child {
-      font-family: sans-serif;
-      font-size: 1em;
-    }
-
-    .import-btn {
-      background: linear-gradient(135deg, #4e54c8, #8f94fb);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 1em;
-      font-family: 'MinecraftTen', sans-serif;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: opacity 0.2s;
-      display: inline-block;
-      margin: 0 auto;
-    }
-
-    .import-btn:hover {
-      opacity: 0.85;
-    }
-
-    #upload {
-      display: none;
-    }
-
-    #glyph-grid {
-      display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      gap: 8px;
-      justify-content: center;
-      max-width: 100%;
-    }
-
-    .glyph-tile {
-      font-size: 46px;
-      aspect-ratio: 1 / 1;
-      min-width: 50px;
-      background: var(--tile-bg);
-      border-radius: 8px;
-      cursor: pointer;
-      user-select: none;
+    .character-wrapper {
+      position: relative;
       display: flex;
       justify-content: center;
       align-items: center;
-      transition: outline 0.2s ease-in-out, transform 0.2s, background 0.3s;
-      overflow: hidden;
+    }
+    .character-wrapper::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      width: 80%;
+      height: 15px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 50%;
+      filter: blur(10px);
+      z-index: 1;
+      animation: floatShadow 5s ease-in-out infinite;
+    }
+    .banner-character {
+      height: 110px;
+      flex-shrink: 0;
+      filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.4));
       position: relative;
+      z-index: 2;
+      animation: float 5s ease-in-out infinite;
     }
-
-    .glyph-tile:hover {
-      outline: 2px solid var(--outline-color);
+    .banner-text {
+      text-align: left;
+      animation: float 5s ease-in-out infinite;
+      animation-delay: -0.3s;
     }
-
+    .banner-text h1 {
+      font-family: 'MinecraftTen', sans-serif;
+      font-size: 2.2em;
+      color: white;
+      margin: 0 0 10px 0;
+      text-shadow: 0 3px 0 #0f1c3d;
+    }
+    .banner-text p {
+      font-family: 'MinecraftTen', sans-serif;
+      font-size: 1.1em;
+      color: white;
+      opacity: 0.9;
+      margin: 0;
+      line-height: 1.4;
+      text-shadow: 1px 1px 0px #0f1c3d;
+    }
+    .upload-layout { display: flex; align-items: center; gap: 20px; text-align: left; }
+    .icon-container { background: var(--icon-bg); padding: 20px; border-radius: 12px; flex-shrink: 0; }
+    .icon-container img { width: 64px; height: 64px; object-fit: contain; display: block; }
+    .text-and-buttons { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+    .upload-title { font-size: 1.4em; margin: 0; }
+    .upload-subtitle { font-family: sans-serif; font-size: 1em; opacity: 0.8; margin: 0; }
+    .button-group { display: flex; gap: 10px; margin-top: 8px; }
+    .import-btn, .restart-btn {
+      color: white; border: none; padding: 12px 18px; font-size: 1em;
+      font-family: 'MinecraftTen', sans-serif; border-radius: 8px; cursor: pointer;
+      transition: opacity 0.2s, background 0.2s; flex-grow: 1;
+    }
+    .import-btn { background: linear-gradient(135deg, #4e54c8, #8f94fb); }
+    .import-btn:hover { opacity: 0.85; }
+    .restart-btn { background: #555; }
+    .restart-btn:hover { background: #777; }
+    #upload { display: none; }
+    #file-info-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(180, 180, 180, 0.2); padding: 8px 14px;
+      border-radius: 8px; margin-bottom: 15px; font-family: sans-serif;
+    }
+    .file-info-text { flex-grow: 1; text-align: center; }
+    .info-bar-icon {
+        cursor: pointer; transition: transform 0.2s; width: 20px; height: 20px; flex-shrink: 0;
+    }
+    .info-bar-icon:hover { transform: scale(1.15); }
+    body.light #file-info-bar { background: rgba(200, 200, 200, 0.3); }
+    #glyph-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; justify-content: center; max-width: 100%; }
+    .glyph-tile {
+      aspect-ratio: 1 / 1; min-width: 0; background: var(--tile-bg); border-radius: 8px; cursor: pointer;
+      user-select: none; display: flex; justify-content: center; align-items: center;
+      transition: outline 0.2s ease-in-out, transform 0.2s, background 0.3s;
+      overflow: hidden; position: relative;
+    }
+    .glyph-tile:hover { outline: 2px solid var(--outline-color); }
     .glyph-tile.selected {
-      animation: highlightPulse 0.6s ease;
-      background: linear-gradient(135deg, #7f00ff, #00bfff);
-      background-size: 200% 200%;
-      box-shadow: 0 0 12px rgba(127,0,255,0.7);
+      animation: highlightPulse 0.6s ease; background: linear-gradient(135deg, #7f00ff, #00bfff);
+      background-size: 200% 200%; box-shadow: 0 0 12px rgba(127,0,255,0.7);
     }
-
-    @keyframes highlightPulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-      100% { transform: scale(1); }
+    @keyframes highlightPulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
+    .glyph-img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+    .tools-container { padding: 15px; }
+    .tool-button-group { display: flex; justify-content: center; gap: 10px; width: 100%; }
+    .tool-btn {
+      background-color: var(--tile-bg); color: var(--text-color); border: 2px solid transparent;
+      padding: 12px 10px; font-size: 0.9em; font-family: 'MinecraftTen', sans-serif;
+      border-radius: 8px; cursor: pointer; transition: background-color 0.2s, border-color 0.2s;
+      flex-grow: 1; flex-basis: 0;
     }
-
-    @keyframes outlineFade {
-      0% { outline: 3px solid var(--outline-color); outline-offset: 0px; }
-      100% { outline: 3px solid transparent; outline-offset: 4px; }
+    .tool-btn:hover { background-color: var(--tile-hover-bg); }
+    .tool-btn.active { background-color: var(--accent-color); color: white; border-color: #8f94fb; }
+    #modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px);
+        display: none; justify-content: center; align-items: center; z-index: 1000;
     }
-
-    .glyph-tile.outline-fade {
-      animation: outlineFade 0.6s ease forwards;
+    #edit-modal {
+        background: var(--container-bg); padding: 25px; border-radius: 12px;
+        box-shadow: 0 0 40px rgba(0,0,0,0.6); width: 90%; max-width: 400px;
+        border: 1px solid var(--tile-bg);
     }
-
-    .glyph-img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      image-rendering: pixelated;
+    .modal-title {
+        font-family: 'MinecraftTen', sans-serif; font-size: 1.8em;
+        margin: 0 0 20px 0; text-align: center;
     }
-
+    .modal-input-group { margin-bottom: 15px; }
+    .modal-input {
+        width: 100%; background: var(--tile-bg); border: 1px solid #555;
+        color: var(--text-color); padding: 10px; border-radius: 8px;
+        font-family: sans-serif; font-size: 1em; box-sizing: border-box;
+    }
+    .dimension-group { display: flex; align-items: center; gap: 10px; }
+    .dimension-input { width: 100%; text-align: center; }
+    .dimension-separator { font-family: sans-serif; font-size: 1.2em; user-select: none; }
+    #modal-submit-btn {
+        width: 100%; padding: 12px; font-family: 'MinecraftTen', sans-serif;
+        font-size: 1.2em; color: white; border: none; border-radius: 8px;
+        background: linear-gradient(135deg, #4e54c8, #8f94fb); cursor: pointer;
+        transition: opacity 0.2s; margin-top: 10px;
+    }
+    #modal-submit-btn:hover { opacity: 0.85; }
+    body.light .modal-input { border-color: #aaa; }
     #toast {
       position: fixed;
-      bottom: 20px;
+      bottom: -100px;
       left: 50%;
       transform: translateX(-50%);
-      background: #00ff88;
-      color: #000;
+      background: linear-gradient(135deg, #00d2ff, #3a7bd5, #4e54c8);
+      background-size: 300% 300%;
+      color: white;
       padding: 12px 24px;
       border-radius: 8px;
       font-weight: bold;
       font-size: 1.1em;
       opacity: 0;
-      transition: opacity 0.3s ease-in-out;
+      transition: opacity 0.3s ease-in-out, bottom 0.3s ease-in-out;
       pointer-events: none;
-      user-select: none;
       z-index: 999;
+      border: 2px solid #a7c7fa;
+      text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.4);
+      animation: toastGradientShift 4s ease infinite;
     }
-
     #toast.show {
       opacity: 1;
+      bottom: 20px;
     }
-
-    #file-info {
-      font-family: sans-serif;
-      background: rgba(180, 180, 180, 0.2);
-      padding: 8px 14px;
-      border-radius: 8px;
-      display: inline-block;
-      margin-bottom: 15px;
+    @keyframes animated-gradient-text {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
-
-    body.light #file-info {
-      background: rgba(200, 200, 200, 0.3);
-    }
-
     footer {
-      background: var(--footer-bg);
-      padding: 14px 0;
-      border-radius: 8px 8px 0 0;
-      font-family: sans-serif;
-      font-weight: bold;
-      text-align: center;
-      font-size: 1.1em;
-      user-select: none;
-      margin-top: auto;
+        background: var(--footer-bg);
+        padding: 20px 0;
+        font-family: sans-serif;
+        text-align: center;
+        user-select: none;
+        margin-top: auto;
+        border-top: 1px solid var(--tile-bg);
     }
-
+    .footer-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+    }
+    .footer-names, .footer-links {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    .footer-text {
+        font-weight: bold;
+        font-size: 1.2em;
+        background: linear-gradient(135deg, #7f00ff, #00bfff, #00ff88, #7f00ff);
+        background-size: 300% 300%;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        animation: animated-gradient-text 8s ease infinite;
+    }
+    .footer-separator {
+        color: #888;
+        font-size: 1em;
+        font-weight: normal;
+        line-height: 1;
+    }
+    .footer-links a svg {
+        fill: var(--text-color);
+        width: 24px;
+        height: 24px;
+        transition: transform 0.2s ease-in-out, fill 0.2s;
+        vertical-align: middle;
+    }
+    .footer-links a:hover svg {
+        transform: scale(1.2);
+        fill: #8f94fb;
+    }
+    @media (max-width: 500px) {
+      .upload-layout { flex-direction: column; text-align: center; }
+      .banner-container {
+          flex-direction: column;
+          text-align: center;
+          gap: 15px;
+          padding: 20px;
+      }
+      .banner-text {
+          text-align: center;
+      }
+    }
+    @media (min-width: 768px) {
+      .container { max-width: 800px; }
+      #glyph-grid { grid-template-columns: repeat(16, 1fr); }
+    }
   </style>
 </head>
 <body>
@@ -300,126 +309,435 @@
     <div class="menu-toggle" onclick="toggleMenu()">☰</div>
     <div class="top-bar-title">Minecraft Bedrock Glyph Tools</div>
     <div class="menu-dropdown" id="menu">
-      <button onclick="setTheme('dark')">Mode Gelap</button>
-      <button onclick="setTheme('light')">Mode Terang</button>
+      <button onclick="setTheme('dark')">Dark Mode</button>
+      <button onclick="setTheme('light')">Light Mode</button>
+    </div>
+  </div>
+
+  <div class="container banner-container">
+    <div class="character-wrapper">
+      <img src="img/vinnch.png" alt="VinnCH Character" class="banner-character">
+    </div>
+    <div class="banner-text">
+      <h1>WELCOMES!</h1>
+      <p>Hey there! Ready to customize your Minecraft glyphs? Just upload your image file below to get started!</p>
     </div>
   </div>
 
   <div class="container upload-container">
-    <div class="icon-text-group">
-      <img src="icon_file.png" alt="File Icon" />
-      <div class="icon-text-lines">
-        <div>📂 Upload Glyph Image</div>
-        <div>Drag & Drop your Glyph</div>
+    <div class="upload-layout">
+      <div class="icon-container"><img src="img/upload.png" alt="File Icon" /></div>
+      <div class="text-and-buttons">
+        <p class="upload-title">UPLOAD GLYPH IMAGE</p>
+        <p class="upload-subtitle">Drag & Drop Your Glyph Here</p>
+        <div class="button-group">
+          <button class="import-btn" onclick="document.getElementById('upload').click()">IMPORT</button>
+          <button class="restart-btn" onclick="handleRestart()">RESTART</button>
+        </div>
       </div>
     </div>
-    <button class="import-btn" onclick="document.getElementById('upload').click()">IMPORT GLYPH FROM FILES</button>
     <input type="file" id="upload" accept="image/*" />
   </div>
 
   <div class="container glyph-container" id="glyph-container" style="display: none;">
-    <div id="file-info"></div>
+    <div id="file-info-bar">
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiIHdpZHRoPSIxOHB4IiBoZWlnaHQ9IjE4cHgiPjxwYXRoIGQ9Ik0zIDE3LjI1VjIxYzAgLjU1LjQ1IDEgMSAxaDMuNzVMMTcuODEgOS45NGwtMy43NS0zLjc1TDMgMTcuMjV6TTIwLjcxIDcuMDRjLjM5LS4zOS4zOS0xLjAyIDAtMS40MWwtMi4zNC0yLjM0Yy0uMzktLjM5LTEuMDItLjM5LTEuNDEgMGwtMS44MyAxLjgzIDMuNzUgMy43NSAxLjgzLTEuODN6Ii8+PC9zdmc+" alt="Edit" class="info-bar-icon" id="edit-icon">
+      <span id="file-info-text" class="file-info-text"></span>
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBmaWxsPSJ3aGl0ZSI+PHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6IiBmaWxsPSJub25lIi8+PHBhdGggZD0iTTUgMjBoMTR2LTJINXYyek0xOSA5aC00VjNIOXY2SDVsNyA3IDctN3oiLz48L3N2Zz4=" alt="Download" class="info-bar-icon" onclick="downloadFullImage()">
+    </div>
     <div id="glyph-grid"></div>
+  </div>
+
+  <div class="container tools-container" id="tools-container" style="display: none;">
+    <div class="tool-button-group">
+      <button id="mode-copy" class="tool-btn">COPY MODE</button>
+      <button id="mode-edit" class="tool-btn">EDIT MODE</button>
+      <button id="mode-download" class="tool-btn">DOWNLOAD MODE</button>
+    </div>
+  </div>
+
+  <div id="modal-overlay">
+    <div id="edit-modal" onclick="event.stopPropagation();">
+      <h2 class="modal-title">EDIT IMG</h2>
+      <div class="modal-input-group">
+        <input type="text" id="edit-file-name" class="modal-input" placeholder="File Name">
+      </div>
+      <div class="modal-input-group dimension-group">
+        <input type="number" id="edit-width" class="modal-input dimension-input" placeholder="Width">
+        <span class="dimension-separator">x</span>
+        <input type="number" id="edit-height" class="modal-input dimension-input" placeholder="Height">
+      </div>
+      <button id="modal-submit-btn">SUBMIT</button>
+    </div>
   </div>
 
   <div id="toast">Copied!</div>
 
   <footer id="footer">
-    Bedrock Glyph Tools by VinnCH
+    <div class="footer-content">
+      <div class="footer-names">
+        <span class="footer-text">@VinnTzyyy</span>
+        <span class="footer-separator">|</span>
+        <span class="footer-text">@xVienzz25</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/VinnTzyyy" target="_blank" title="GitHub">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.11.82-.26.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.043-1.61-4.043-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.085 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.93 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.289 0 .319.22.694.824.576A12.001 12.001 0 0024 12c0-6.627-5.373-12-12-12z"/></svg>
+        </a>
+        <span class="footer-separator">|</span>
+        <a href="https://www.youtube.com/@vinzemc" target="_blank" title="YouTube">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.58 7.19c-.23-.86-.91-1.54-1.77-1.77C18.25 5 12 5 12 5s-6.25 0-7.81.42c-.86.23-1.54.91-1.77 1.77C2 8.75 2 12 2 12s0 3.25.42 4.81c.23.86.91 1.54 1.77 1.77C5.75 19 12 19 12 19s6.25 0 7.81-.42c.86.23 1.54.91 1.77-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81zM9.5 15.5V8.5l6 3.5-6 3.5z"/></svg>
+        </a>
+        <span class="footer-separator">|</span>
+        <a href="https://chat.whatsapp.com/LvoDkyMBBDWD7fU6wbI3S8?mode=wwt" target="_blank" title="WhatsApp">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91s-4.45-9.91-9.91-9.91zM17.46 14.3c-.28-.14-1.67-.82-1.93-.91-.26-.1-.45-.14-.64.14-.19.28-.73.91-.9 1.1-.17.19-.34.21-.63.07-.29-.14-1.25-.46-2.37-1.46-.88-.77-1.47-1.73-1.64-2.02-.17-.29-.01-.45.12-.58.12-.12.26-.29.39-.43s.17-.29.26-.48c.09-.19.04-.36-.02-.5s-.64-1.53-.87-2.1c-.23-.55-.47-.48-.64-.48-.17 0-.36-.01-.54-.01s-.45.07-.68.35c-.23.28-.87.85-.87 2.07s.9 2.4, 1.02 2.57c.12.17 1.74 2.65 4.22 3.72.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.67-.68 1.9-1.33.24-.65.24-1.21.17-1.33s-.26-.19-.54-.33z"/></svg>
+        </a>
+      </div>
+    </div>
   </footer>
 
-  <script>
-    const upload = document.getElementById('upload');
+<script>
+    const uploadInput = document.getElementById('upload');
     const grid = document.getElementById('glyph-grid');
     const toast = document.getElementById('toast');
     const menu = document.getElementById('menu');
-    const fileInfo = document.getElementById('file-info');
     const glyphContainer = document.getElementById('glyph-container');
+    const toolsContainer = document.getElementById('tools-container');
+    const copyModeBtn = document.getElementById('mode-copy');
+    const editModeBtn = document.getElementById('mode-edit');
+    const downloadModeBtn = document.getElementById('mode-download');
+    const fileInfoText = document.getElementById('file-info-text');
 
-    function toggleMenu() {
-      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function setTheme(mode) {
-      document.body.classList.toggle('light', mode === 'light');
-      toggleMenu();
-    }
+    const modalOverlay = document.getElementById('modal-overlay');
+    const editIcon = document.getElementById('edit-icon');
+    const modalSubmitBtn = document.getElementById('modal-submit-btn');
+    const editFileNameInput = document.getElementById('edit-file-name');
+    const editWidthInput = document.getElementById('edit-width');
+    const editHeightInput = document.getElementById('edit-height');
 
     let selectedTile = null;
-    function selectTile(tile) {
-      if (selectedTile) {
-        selectedTile.classList.remove("selected");
-      }
-      selectedTile = tile;
-      tile.classList.add("selected");
-    }
+    let currentImage = {
+        imageData: null, fileName: '', fileSize: 0, imageWidth: 0, imageHeight: 0
+    };
 
-    upload.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
+    document.addEventListener('DOMContentLoaded', initializeApp);
+    copyModeBtn.addEventListener('click', () => setMode('copy'));
+    editModeBtn.addEventListener('click', () => setMode('edit'));
+    downloadModeBtn.addEventListener('click', () => setMode('download'));
+    uploadInput.addEventListener('change', handleFileUpload);
+    
+    editIcon.addEventListener('click', openEditModal);
+    modalOverlay.addEventListener('click', closeEditModal);
+    modalSubmitBtn.addEventListener('click', handleEditSubmit);
 
-      const match = file.name.match(/([0-9a-fA-F]{2})/);
-      const filenameHex = match ? match[1].toUpperCase() : 'E1';
-
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-
-        const tileSizeX = img.width / 16;
-        const tileSizeY = img.height / 16;
-        grid.innerHTML = "";
-
-        const fileSizeKB = (file.size / 1024).toFixed(1);
-        fileInfo.textContent = `${file.name} - ${fileSizeKB} KB - ${img.width}×${img.height} px`;
-        glyphContainer.style.display = 'block';
-
-        for (let row = 0; row < 16; row++) {
-          for (let col = 0; col < 16; col++) {
-            const imageData = ctx.getImageData(col * tileSizeX, row * tileSizeY, tileSizeX, tileSizeY);
-            const tileCanvas = document.createElement('canvas');
-            tileCanvas.width = tileSizeX;
-            tileCanvas.height = tileSizeY;
-            tileCanvas.getContext('2d').putImageData(imageData, 0, 0);
-
-            const tileImg = new Image();
-            tileImg.src = tileCanvas.toDataURL();
-            tileImg.className = 'glyph-img';
-
-            const charCode = parseInt(filenameHex + (row * 16 + col).toString(16).padStart(2, '0'), 16);
-            const glyphChar = String.fromCharCode(charCode);
-
-            const tile = document.createElement('div');
-            tile.className = 'glyph-tile';
-            tile.appendChild(tileImg);
-
-            tile.addEventListener('click', () => {
-              navigator.clipboard.writeText(glyphChar).then(() => {
-                showToast(`Copied "${glyphChar}"`);
-                selectTile(tile);
-
-                tile.classList.remove("outline-fade");
-                void tile.offsetWidth;
-                tile.classList.add("outline-fade");
-              });
-            });
-
-            grid.appendChild(tile);
-          }
+    function initializeApp() {
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        setTheme(savedTheme, true);
+        const savedMode = localStorage.getItem('currentMode') || 'copy';
+        setMode(savedMode);
+        const savedGlyph = localStorage.getItem('savedGlyph');
+        if (savedGlyph) {
+            currentImage = JSON.parse(savedGlyph);
+            processImage(currentImage.imageData, currentImage.fileName, currentImage.fileSize);
+        } else {
+            loadDefaultState();
         }
-      };
-
-      img.src = URL.createObjectURL(file);
-    });
-
-    function showToast(text) {
-      toast.textContent = text;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 1500);
+        sessionStorage.removeItem('editData');
     }
-  </script>
+
+    function loadDefaultState() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 256; canvas.height = 256;
+        const defaultImageData = canvas.toDataURL('image/png');
+        const defaultFileName = 'glyph_E0.png';
+        saveGlyphToStorage(defaultImageData, defaultFileName, 0, 256, 256, true);
+        processImage(defaultImageData, defaultFileName, 0);
+    }
+
+    function processImage(imageSrc, fileName, fileSize) {
+        const img = new Image();
+        img.onload = () => {
+            currentImage = { imageData: img.src, fileName, fileSize, imageWidth: img.width, imageHeight: img.height };
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width; canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+
+            const match = fileName.match(/([0-9a-fA-F]{2})/);
+            const filenameHex = match ? match[1].toUpperCase() : 'E0';
+            const editedGlyphs = JSON.parse(localStorage.getItem('editedGlyphs')) || {};
+
+            const tileSizeX = img.width / 16;
+            const tileSizeY = img.height / 16;
+            grid.innerHTML = "";
+
+            updateFileInfoUI();
+            glyphContainer.style.display = 'block';
+            toolsContainer.style.display = 'block';
+
+            for (let row = 0; row < 16; row++) {
+                for (let col = 0; col < 16; col++) {
+                    const tile = createGlyphTile(ctx, row, col, tileSizeX, tileSizeY, filenameHex, editedGlyphs);
+                    grid.appendChild(tile);
+                }
+            }
+        };
+        img.src = imageSrc;
+    }
+    
+    function createGlyphTile(mainCtx, row, col, tileSizeX, tileSizeY, filenameHex, editedGlyphs) {
+        const imageData = mainCtx.getImageData(col * tileSizeX, row * tileSizeY, tileSizeX, tileSizeY);
+        const tileCanvas = document.createElement('canvas');
+        tileCanvas.width = tileSizeX; tileCanvas.height = tileSizeY;
+        tileCanvas.getContext('2d').putImageData(imageData, 0, 0);
+
+        const tileKey = `${row}-${col}`;
+        const originalDataUrl = tileCanvas.toDataURL();
+        const editedDataUrl = editedGlyphs[tileKey];
+        
+        const tileImg = new Image();
+        tileImg.src = editedDataUrl || originalDataUrl;
+        tileImg.className = 'glyph-img';
+
+        const charCode = parseInt(filenameHex + (row * 16 + col).toString(16).padStart(2, '0'), 16);
+        const glyphChar = String.fromCharCode(charCode);
+
+        const tile = document.createElement('div');
+        tile.className = 'glyph-tile';
+        tile.appendChild(tileImg);
+
+        tile.dataset.glyphChar = glyphChar;
+        tile.dataset.imageDataUrl = tileImg.src;
+        tile.dataset.originalDataUrl = originalDataUrl;
+        tile.dataset.fileName = `glyph_${filenameHex}_${row}_${col}.png`;
+        tile.dataset.row = row;
+        tile.dataset.col = col;
+
+        tile.addEventListener('click', handleTileClick);
+        return tile;
+    }
+
+    function handleTileClick(event) {
+        const tile = event.currentTarget;
+        const currentMode = localStorage.getItem('currentMode') || 'copy';
+
+        if (selectedTile) selectedTile.classList.remove("selected");
+        selectedTile = tile;
+        tile.classList.add("selected");
+
+        switch (currentMode) {
+            case 'copy':
+                navigator.clipboard.writeText(tile.dataset.glyphChar).then(() => showToast(`Copied "${tile.dataset.glyphChar}"`));
+                break;
+            case 'edit':
+                sessionStorage.setItem('editData', JSON.stringify({
+                    imageData: tile.dataset.imageDataUrl, originalData: tile.dataset.originalDataUrl,
+                    row: tile.dataset.row, col: tile.dataset.col,
+                }));
+                window.location.href = 'edit.html';
+                break;
+            case 'download':
+                const link = document.createElement('a');
+                link.href = tile.dataset.imageDataUrl;
+                link.download = tile.dataset.fileName;
+                link.click();
+                showToast(`Downloaded ${tile.dataset.fileName}`);
+                break;
+        }
+    }
+    
+    function handleFileUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const imageData = event.target.result;
+            const img = new Image();
+            img.onload = () => {
+                saveGlyphToStorage(imageData, file.name, file.size, img.width, img.height, true);
+                processImage(imageData, file.name, file.size);
+            };
+            img.src = imageData;
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    function handleRestart() {
+        localStorage.clear();
+        window.location.reload();
+    }
+
+    function openEditModal() {
+        const [name, _] = currentImage.fileName.split('.');
+        editFileNameInput.value = name;
+        editWidthInput.value = currentImage.imageWidth;
+        editHeightInput.value = currentImage.imageHeight;
+        modalOverlay.style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        modalOverlay.style.display = 'none';
+    }
+
+    function resizeImage(imageDataUrl, width, height) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.imageSmoothingEnabled = false;
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/png'));
+            };
+            img.onerror = reject;
+            img.src = imageDataUrl;
+        });
+    }
+
+    async function handleEditSubmit() {
+        const [_, ext] = currentImage.fileName.split('.');
+        const newName = editFileNameInput.value.trim() || 'glyph_E0';
+        const newWidth = parseInt(editWidthInput.value) || 256;
+        const newHeight = parseInt(editHeightInput.value) || 256;
+        
+        const nameChanged = currentImage.fileName !== `${newName}.${ext}`;
+        const sizeChanged = currentImage.imageWidth !== newWidth || currentImage.imageHeight !== newHeight;
+        
+        if (!nameChanged && !sizeChanged) {
+            closeEditModal();
+            return;
+        }
+
+        showToast('Processing new image...');
+        let finalImageData = currentImage.imageData;
+
+        try {
+            if (sizeChanged) {
+                finalImageData = await resizeImage(currentImage.imageData, newWidth, newHeight);
+
+                const oldEditedGlyphs = JSON.parse(localStorage.getItem('editedGlyphs')) || {};
+                if (Object.keys(oldEditedGlyphs).length > 0) {
+                    showToast('Scaling existing edits...');
+                    const newTileWidth = newWidth / 16;
+                    const newTileHeight = newHeight / 16;
+                    const newEditedGlyphs = {};
+                    
+                    const resizePromises = Object.entries(oldEditedGlyphs).map(async ([key, oldTileData]) => {
+                        const newTileData = await resizeImage(oldTileData, newTileWidth, newTileHeight);
+                        newEditedGlyphs[key] = newTileData;
+                    });
+                    
+                    await Promise.all(resizePromises);
+                    localStorage.setItem('editedGlyphs', JSON.stringify(newEditedGlyphs));
+                }
+            }
+            
+            const finalFileName = `${newName}.${ext}`;
+            saveGlyphToStorage(finalImageData, finalFileName, currentImage.fileSize, newWidth, newHeight);
+            processImage(finalImageData, finalFileName, currentImage.fileSize);
+            showToast('Image info updated successfully!');
+
+        } catch (error) {
+            showToast('Failed to process image!');
+            console.error("Image processing failed:", error);
+        } finally {
+            closeEditModal();
+        }
+    }
+    
+    function setMode(newMode) {
+        localStorage.setItem('currentMode', newMode);
+        if (!document.hidden) showToast(`Mode: ${newMode.toUpperCase()}`);
+        copyModeBtn.classList.toggle('active', newMode === 'copy');
+        editModeBtn.classList.toggle('active', newMode === 'edit');
+        downloadModeBtn.classList.toggle('active', newMode === 'download');
+    }
+
+    function setTheme(mode, fromInit = false) {
+        localStorage.setItem('theme', mode);
+        document.body.classList.toggle('light', mode === 'light');
+        if (!fromInit) toggleMenu();
+    }
+
+    function saveGlyphToStorage(imageData, fileName, fileSize, imageWidth, imageHeight, clearEdits = false) {
+        currentImage = { imageData, fileName, fileSize, imageWidth, imageHeight };
+        localStorage.setItem('savedGlyph', JSON.stringify(currentImage));
+        if (clearEdits) localStorage.removeItem('editedGlyphs');
+    }
+    
+    function updateFileInfoUI() {
+        fileInfoText.textContent = `${currentImage.fileName} - ${(currentImage.fileSize / 1024).toFixed(1)} KB - ${currentImage.imageWidth}x${currentImage.imageHeight} px`;
+    }
+
+    function toggleMenu() { menu.style.display = menu.style.display === 'block' ? 'none' : 'block'; }
+    
+    let toastTimeout;
+    function showToast(text) {
+        clearTimeout(toastTimeout);
+        toast.textContent = text;
+        toast.classList.add('show');
+        toastTimeout = setTimeout(() => toast.classList.remove('show'), 1500);
+    }
+    
+    async function downloadFullImage() {
+        showToast('Preparing download...');
+
+        const canvas = document.createElement('canvas');
+        canvas.width = currentImage.imageWidth;
+        canvas.height = currentImage.imageHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+
+        try {
+            const baseImg = new Image();
+            await new Promise((resolve, reject) => {
+                baseImg.onload = resolve;
+                baseImg.onerror = reject;
+                baseImg.src = currentImage.imageData;
+            });
+            ctx.drawImage(baseImg, 0, 0);
+
+            const editedGlyphs = JSON.parse(localStorage.getItem('editedGlyphs')) || {};
+            if (Object.keys(editedGlyphs).length > 0) {
+                const tileSizeX = canvas.width / 16;
+                const tileSizeY = canvas.height / 16;
+                
+                const drawingPromises = Object.entries(editedGlyphs).map(([key, tileDataUrl]) => {
+                    return new Promise(async (resolve, reject) => {
+                        const [row, col] = key.split('-').map(Number);
+                        const x = col * tileSizeX;
+                        const y = row * tileSizeY;
+
+                        const tileImg = new Image();
+                        await new Promise((res, rej) => {
+                            tileImg.onload = res;
+                            tileImg.onerror = rej;
+                            tileImg.src = tileDataUrl;
+                        });
+                        ctx.drawImage(tileImg, x, y, tileSizeX, tileSizeY);
+                        resolve();
+                    });
+                });
+                
+                await Promise.all(drawingPromises);
+            }
+
+            const finalImageDataUrl = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = finalImageDataUrl;
+            link.download = currentImage.fileName;
+            link.click();
+            showToast(`Downloading ${currentImage.fileName}...`);
+
+        } catch (error) {
+            showToast('Download failed!');
+            console.error("Failed to build and download image:", error);
+        }
+    }
+</script>
+
 </body>
 </html>
