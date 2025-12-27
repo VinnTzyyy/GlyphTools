@@ -10,29 +10,59 @@
             src: url('font/MinecraftTen.ttf') format('truetype');
         }
         :root {
-            --bg: #1a1a1a; --text: white; --container-bg: #222; --tool-bg: #333;
-            --tool-hover: #444; --tool-active: #4e54c8; --header-bg: #1e1e1e;
+            --bg: #1a1a1a; 
+            --text: white; 
+            --container-bg: #222; 
+            --tool-bg: #333;
+            --tool-hover: #444; 
+            --tool-active: #4e54c8; 
             --border-color: #404040;
         }
         * { box-sizing: border-box; }
+
         body {
             background-color: var(--bg); color: var(--text);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
             touch-action: none;
-            display: flex; flex-direction: column; height: 100vh;
         }
+        
         .editor-header {
-            background-color: var(--header-bg); padding: 0 20px; height: 60px;
-            display: flex; justify-content: center; align-items: center;
-            border-bottom: 1px solid var(--border-color); user-select: none; flex-shrink: 0;
+            background: linear-gradient(270deg, #8A2BE2, #87CEEB, #6a11cb, #87CEEB);
+            background-size: 400% 400%;
+            animation: gradientAnimation 12s ease infinite;
+            
+            padding: 0 20px; 
+            height: 60px;
+            display: flex; 
+            justify-content: flex-start; /* Rata Kiri */
+            align-items: center;
+            border-bottom: 1px solid var(--border-color); 
+            user-select: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
-        .editor-header h1 { font-family: 'MinecraftTen', sans-serif; font-size: 1.5em; margin: 0; }
+        
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .editor-header h1 { 
+            font-family: 'MinecraftTen', sans-serif; 
+            font-size: 1.5em; 
+            margin: 0; 
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+        }
+        
         .editor-main {
-            flex-grow: 1; display: flex; flex-direction: column; align-items: center;
-            gap: 20px; padding: 20px; user-select: none; overflow-y: auto;
+            display: flex; flex-direction: column; align-items: center;
+            gap: 20px; padding: 20px; user-select: none;
         }
+
         .editor-section {
             width: 100%; max-width: 552px;
             background-color: var(--container-bg); border-radius: 12px;
@@ -40,39 +70,83 @@
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
         }
-        .canvas-container { padding: 0; border: 2px solid var(--border-color); background-color: #111; overflow: hidden; }
+        
+        .canvas-container {
+            padding: 0;
+            border: 4px solid #333;
+            background-color: #333;
+            overflow: hidden;
+        }
+        
         #canvas-grid-wrapper {
-            width: 300px; height: 300px;
-            position: relative; display: flex; justify-content: center; align-items: center;
+            width: 512px; height: 512px;
+            max-width: 90vw; max-height: 90vw;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            
+            background-color: #ffffff; /* Warna Pixel 1 (Putih) */
+            
+            background-image: conic-gradient(
+                #d0d0d0 90deg,  /* Warna Pixel 2 (Abu) */
+                transparent 90deg 180deg,
+                #d0d0d0 180deg 270deg,
+                transparent 270deg
+            );
+            
+            background-size: calc(var(--pixel-scale, 32px) * 2) calc(var(--pixel-scale, 32px) * 2);
+            background-position: 0 0;
         }
+
         #canvas-grid-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
-            background-image: repeating-linear-gradient(var(--border-color) 0 1px, transparent 1px 100%), repeating-linear-gradient(90deg, var(--border-color) 0 1px, transparent 1px 100%);
-            display: none; z-index: 2;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            background-image:
+                repeating-linear-gradient(#00000022 0 1px, transparent 1px 100%),
+                repeating-linear-gradient(90deg, #00000022 0 1px, transparent 1px 100%);
+            background-size: var(--pixel-scale, 32px) var(--pixel-scale, 32px);
+            display: none; /* Diatur oleh JS */
+            z-index: 5;
         }
+
         #editor-canvas {
             width: 100%; height: 100%;
-            image-rendering: pixelated; cursor: crosshair; z-index: 1;
-            background-image: linear-gradient(45deg, #404040 25%, transparent 25%), linear-gradient(-45deg, #404040 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #404040 75%), linear-gradient(-45deg, transparent 75%, #404040 75%);
-            background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            image-rendering: pixelated; /* Wajib agar gambar tajam */
+            cursor: crosshair;
+            position: relative;
+            z-index: 10;
         }
+        
+        .tools-container { align-items: center; }
         .toolbar { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
         .tool-btn {
             background-color: var(--tool-bg); border: 2px solid transparent; color: var(--text);
-            width: 45px; height: 45px; border-radius: 8px; cursor: pointer;
-            transition: background-color 0.2s; display: flex; justify-content: center; align-items: center;
+            width: 50px; height: 50px; border-radius: 8px; cursor: pointer;
+            transition: background-color 0.2s; display: grid; place-items: center;
         }
         .tool-btn:hover { background-color: var(--tool-hover); }
         .tool-btn.active { background-color: var(--tool-active); border-color: #8f94fb; }
-        .tool-btn svg { width: 24px; height: 24px; fill: white; pointer-events: none; }
         .tool-btn.disabled { opacity: 0.4; cursor: not-allowed; }
-        .tool-separator { width: 1px; height: 30px; background: var(--border-color); margin: 0 5px; align-self: center; }
+        .tool-separator { width: 1px; height: 40px; background: var(--border-color); margin: 5px; }
+
+        .icon-mask {
+            display: inline-block;
+            width: 32px; height: 32px;
+            background-color: white; /* Warna Ikon Default */
+            -webkit-mask-image: var(--icon-url); mask-image: var(--icon-url);
+            -webkit-mask-size: contain; mask-size: contain;
+            -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+            -webkit-mask-position: center; mask-position: center;
+        }
+        .tool-btn.active .icon-mask { background-color: white; }
+        .tool-btn:hover .icon-mask { background-color: #e0e0e0; }
+
+        .actions-and-palette-container { gap: 20px; }
         .palette-swatches {
             display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
-            padding-bottom: 20px; border-bottom: 1px solid var(--border-color); width: 100%; margin-bottom: 20px;
+            padding-bottom: 20px; border-bottom: 1px solid var(--border-color); width: 100%;
         }
         .swatch-btn {
-            width: 30px; height: 30px; border-radius: 6px; border: 2px solid var(--border-color);
+            width: 35px; height: 35px; border-radius: 8px; border: 2px solid var(--border-color);
             cursor: pointer; transition: transform 0.1s;
         }
         .swatch-btn:hover { transform: scale(1.1); }
@@ -80,51 +154,53 @@
         .action-btn {
             padding: 12px 20px; border-radius: 8px; border: none;
             font-family: 'MinecraftTen', sans-serif; font-size: 1.0em; color: white;
-            cursor: pointer; transition: opacity 0.2s; min-width: 120px;
+            cursor: pointer; transition: transform 0.1s; min-width: 150px;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
         }
-        .action-btn.save { background: linear-gradient(135deg, #4e54c8, #8f94fb); }
-        .action-btn.cancel { background: #555; }
-        .action-btn:active { transform: scale(0.98); }
+        .action-btn:active { transform: scale(0.95); }
+        .action-btn.save { background-image: linear-gradient(135deg, #007bff, #00d4ff); }
+        .action-btn.cancel { background-image: linear-gradient(135deg, #dc3545, #ff7851); }
+
         .color-picker-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center;
-            z-index: 100; opacity: 1; transition: opacity 0.2s; pointer-events: auto; backdrop-filter: blur(2px);
+            background: rgba(0,0,0,0.5); display: flex;
+            justify-content: center; align-items: center;
+            z-index: 100; opacity: 1; transition: opacity 0.2s; pointer-events: auto;
         }
         .color-picker-modal.hidden { opacity: 0; pointer-events: none; }
         .color-picker-content {
-            background: var(--container-bg); border-radius: 12px; width: 340px; max-width: 90%;
-            padding: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); border: 1px solid var(--border-color);
+            background: var(--container-bg); border-radius: 12px;
+            width: 380px; max-width: 95%; padding: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+            position: absolute;
         }
         .color-picker-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
-            font-family: 'MinecraftTen', sans-serif; font-size: 1.2em; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+            font-family: 'MinecraftTen', sans-serif; font-size: 1.2em;
+            cursor: move; touch-action: none; user-select: none; padding-bottom: 15px; border-bottom: 1px solid var(--border-color);
         }
-        .close-btn { cursor: pointer; font-size: 1.5em; padding: 0 5px; }
-        .color-display { display: flex; gap: 10px; margin-bottom: 15px; height: 40px; }
-        .color-preview { flex: 1; border-radius: 6px; border: 1px solid #555; }
-        .sv-panel { width: 100%; height: 180px; position: relative; border-radius: 6px; cursor: crosshair; margin-bottom: 15px; overflow: hidden; }
-        .sv-panel .white, .sv-panel .black { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+        .close-btn { cursor: pointer; font-size: 1.5em; line-height: 1; }
+        .color-display { display: flex; gap: 10px; margin-bottom: 15px; height: 50px; }
+        .color-preview { flex: 1; border-radius: 8px; }
+        .sv-panel { width: 100%; height: 200px; position: relative; background: red; border-radius: 8px; cursor: crosshair; }
+        .sv-panel .white, .sv-panel .black { position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 8px; }
         .sv-panel .white { background: linear-gradient(to right, #fff, rgba(255,255,255,0)); }
         .sv-panel .black { background: linear-gradient(to top, #000, rgba(0,0,0,0)); }
-        .sv-picker { position: absolute; width: 12px; height: 12px; border: 2px solid #fff; border-radius: 50%; transform: translate(-6px, -6px); box-shadow: 0 0 4px rgba(0,0,0,0.8); pointer-events: none; }
-        .slider-group { display: flex; flex-direction: column; gap: 12px; }
-        .slider-container { position: relative; width: 100%; height: 14px; border-radius: 7px; cursor: pointer; }
-        .slider-track { width: 100%; height: 100%; border-radius: 7px; }
-        .slider-thumb { position: absolute; top: 50%; width: 18px; height: 18px; border: 2px solid #fff; border-radius: 50%; background: var(--bg); transform: translate(-9px, -50%); box-shadow: 0 0 4px rgba(0,0,0,0.5); pointer-events: none; }
+        .sv-picker { position: absolute; width: 16px; height: 16px; border: 2px solid #fff; border-radius: 50%; transform: translate(-8px, -8px); box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        .slider-group { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; }
+        .slider-container { position: relative; width: 100%; height: 16px; border-radius: 8px; cursor: pointer; }
+        .slider-track { width: 100%; height: 100%; border-radius: 8px; }
+        .slider-thumb { position: absolute; top: 50%; width: 20px; height: 20px; border: 2px solid #fff; border-radius: 50%; background: #888; transform: translate(-10px, -50%); box-shadow: 0 0 5px rgba(0,0,0,0.5); }
         #hue-slider .slider-track { background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00); }
         #alpha-slider .slider-track { background-image: linear-gradient(45deg, #808080 25%, transparent 25%), linear-gradient(-45deg, #808080 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #808080 75%), linear-gradient(-45deg, transparent 75%, #808080 75%); background-size: 10px 10px; }
-        #alpha-gradient { position: absolute; width: 100%; height: 100%; border-radius: 7px; }
-        .color-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
-        .input-wrap { display: flex; flex-direction: column; align-items: center; }
-        .input-wrap label { font-size: 0.7em; color: #aaa; margin-bottom: 2px; }
-        .color-inputs input { width: 100%; background: var(--tool-bg); border: 1px solid #555; color: white; padding: 4px; border-radius: 4px; text-align: center; font-family: monospace; }
-        .hex-wrap { grid-column: span 4; display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
-        .hex-wrap label { min-width: 30px; font-weight: bold; }
+        #alpha-gradient { position: absolute; width: 100%; height: 100%; border-radius: 8px; }
+        .color-inputs { display: grid; grid-template-columns: 1fr 2fr; gap: 8px; align-items: center; margin-top: 15px; font-size: 0.9em; }
+        .color-inputs label { font-weight: bold; }
+        .color-inputs input { width: 100%; background: var(--tool-bg); border: 1px solid var(--border-color); color: var(--text); border-radius: 5px; padding: 5px; text-align: center; }
     </style>
 </head>
 <body>
     <header class="editor-header">
-        <h1>Glyph Editor</h1>
+        <h1>Glyph Pixel Editor</h1>
     </header>
 
     <main class="editor-main">
@@ -134,81 +210,60 @@
                 <canvas id="editor-canvas"></canvas>
             </div>
         </div>
-
         <div class="editor-section tools-container">
             <div class="toolbar" id="toolbar"></div>
         </div>
-
         <div class="editor-section actions-and-palette-container">
             <div class="palette-swatches" id="palette-swatches"></div>
             <div class="main-action-buttons">
-                <button id="save-btn" class="action-btn save">SAVE</button>
-                <button id="cancel-btn" class="action-btn cancel">CANCEL</button>
+                <button id="save-btn" class="action-btn save">Save & Return</button>
+                <button id="cancel-btn" class="action-btn cancel">Cancel</button>
             </div>
         </div>
     </main>
     
     <div id="color-picker-modal" class="color-picker-modal hidden">
         <div class="color-picker-content">
-            <div class="color-picker-header">
+            <div class="color-picker-header" id="color-picker-header">
                 <span>Color Picker</span>
                 <span class="close-btn" id="close-color-picker">×</span>
             </div>
-            <div class="color-display">
-                <div id="old-color" class="color-preview"></div>
-                <div id="new-color" class="color-preview"></div>
-            </div>
-            <div class="sv-panel" id="sv-panel">
-                <div class="white"></div><div class="black"></div>
-                <div class="sv-picker" id="sv-picker"></div>
-            </div>
-            <div class="slider-group">
-                <div class="slider-container" id="hue-slider">
-                    <div class="slider-track"></div>
-                    <div class="slider-thumb" id="hue-thumb"></div>
-                </div>
-                <div class="slider-container" id="alpha-slider">
-                    <div class="slider-track"></div>
-                    <div id="alpha-gradient"></div>
-                    <div class="slider-thumb" id="alpha-thumb"></div>
-                </div>
-            </div>
-            <div class="color-inputs">
-                <div class="hex-wrap">
-                    <label>HEX</label>
-                    <input type="text" id="hex-input">
-                </div>
-                <div class="input-wrap"><label>R</label><input type="number" id="r-input" max="255"></div>
-                <div class="input-wrap"><label>G</label><input type="number" id="g-input" max="255"></div>
-                <div class="input-wrap"><label>B</label><input type="number" id="b-input" max="255"></div>
-                <div class="input-wrap"><label>A</label><input type="number" id="a-input" max="255"></div>
-            </div>
+            <div class="color-display"> <div id="old-color" class="color-preview old"></div> <div id="new-color" class="color-preview new"></div> </div>
+            <div class="sv-panel" id="sv-panel"> <div class="white"></div><div class="black"></div> <div class="sv-picker" id="sv-picker"></div> </div>
+            <div class="slider-group"> <div class="slider-container" id="hue-slider"> <div class="slider-track"></div> <div class="slider-thumb" id="hue-thumb"></div> </div> <div class="slider-container" id="alpha-slider"> <div class="slider-track"></div> <div id="alpha-gradient" class="slider-gradient"></div> <div class="slider-thumb" id="alpha-thumb"></div> </div> </div>
+            <div class="color-inputs"> <label for="hex-input">HEX</label> <input type="text" id="hex-input"> <label for="r-input">R</label> <input type="number" id="r-input" min="0" max="255"> <label for="g-input">G</label> <input type="number" id="g-input" min="0" max="255"> <label for="b-input">B</label> <input type="number" id="b-input" min="0" max="255"> <label for="a-input">A</label> <input type="number" id="a-input" min="0" max="255"> </div>
         </div>
     </div>
 
 <script>
     const canvas = document.getElementById('editor-canvas');
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    const gridWrapper = document.getElementById('canvas-grid-wrapper');
     const gridOverlay = document.getElementById('canvas-grid-overlay');
     const paletteSwatchesContainer = document.getElementById('palette-swatches');
     
     const state = {
-        editData: null, activeTool: 'pencil', isDrawing: false,
-        history: [], redoStack: [], maxHistory: 30, currentColor: 'rgba(255, 255, 255, 1)',
+        editData: null,
+        activeTool: 'pencil',
+        isDrawing: false,
+        history: [],
+        redoStack: [],
+        maxHistory: 30,
+        currentColor: 'rgba(255, 255, 255, 1)',
     };
 
     const tools = [
-        { id: 'pencil', title: 'Pencil', svg: '<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>' },
-        { id: 'picker', title: 'Eyedropper', svg: '<svg viewBox="0 0 24 24"><path d="M20.71 5.63l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-3.12 3.12-1.93-1.91-1.41 1.41 1.42 1.42L3 16.25V21h4.75l8.92-8.92 1.42 1.42 1.41-1.41-1.92-1.92 3.12-3.12c.4-.4.4-1.03.01-1.42zM6.92 19L5 17.08l8.06-8.06 1.92 1.92L6.92 19z"/></svg>' },
-        { id: 'eraser', title: 'Eraser', svg: '<svg viewBox="0 0 24 24"><path d="M15.14 3c-.51 0-1.02.2-1.41.59L2.59 14.73c-.78.77-.78 2.04 0 2.83L5.17 20.16c.78.78 2.05.78 2.83 0l11.03-11.03c.79-.79.79-2.04 0-2.83l-2.58-2.58C16.04 3.2 15.59 3 15.14 3zM17 18l-1.5 1.5H8.5l-2-2H20v.5z"/></svg>' },
-        { id: 'bucket', title: 'Bucket', svg: '<svg viewBox="0 0 24 24"><path d="M16.56 8.94L7.62 0 6.21 1.41l2.38 2.38-5.15 5.15a1.49 1.49 0 0 0 0 2.12l5.5 5.5c.29.29.68.44 1.06.44s.77-.15 1.06-.44l5.5-5.5c.59-.58.59-1.53 0-2.12zM5.21 10l3.75-3.75 8.75 8.75-3.75 3.75L5.21 10zM19 11.5s-2 2.17-2 3.5c0 1.1.9 2 2 2s2-.9 2-2c0-1.33-2-3.5-2-3.5z"/></svg>' },
+        { id: 'pencil', icon: `<span class="icon-mask" style="--icon-url: url('img/pencil.svg');"></span>`, title: 'Pencil (P)' },
+        { id: 'picker', icon: `<span class="icon-mask" style="--icon-url: url('img/picker.svg');"></span>`, title: 'Eyedropper (I)' },
+        { id: 'eraser', icon: `<span class="icon-mask" style="--icon-url: url('img/eraser.svg');"></span>`, title: 'Eraser (E)' },
+        { id: 'bucket', icon: `<span class="icon-mask" style="--icon-url: url('img/bucket.svg');"></span>`, title: 'Bucket (B)' },
         { type: 'separator' },
-        { id: 'undo', title: 'Undo', svg: '<svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>' },
-        { id: 'redo', title: 'Redo', svg: '<svg viewBox="0 0 24 24"><path d="M18.4 10.6C16.55 9 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg>' },
+        { id: 'undo', icon: `<span class="icon-mask" style="--icon-url: url('img/undo.svg');"></span>`, title: 'Undo (Ctrl+Z)' },
+        { id: 'redo', icon: `<span class="icon-mask" style="--icon-url: url('img/redo.svg');"></span>`, title: 'Redo (Ctrl+Y)' },
         { type: 'separator' },
-        { id: 'palette', title: 'Palette', svg: '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0 0 18c4.97 0 9-4.03 9-9 0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1zM7.88 7.88c.66 0 1.2.54 1.2 1.2s-.54 1.2-1.2 1.2-1.2-.54-1.2-1.2.54-1.2 1.2-1.2zm-1.5 5.5c.66 0 1.2.54 1.2 1.2s-.54 1.2-1.2 1.2-1.2-.54-1.2-1.2.54-1.2 1.2-1.2zm11.16 2.05c-.66 0-1.2-.54-1.2-1.2s.54-1.2 1.2-1.2 1.2.54 1.2 1.2-.54 1.2-1.2 1.2zM12 15c.66 0 1.2.54 1.2 1.2s-.54 1.2-1.2 1.2-1.2-.54-1.2-1.2.54-1.2 1.2-1.2z"/></svg>' },
+        { id: 'palette', icon: `<span class="icon-mask" style="--icon-url: url('img/palette.svg');"></span>`, title: 'Color Palette (C)' },
     ];
-
+    
     function createToolbar() {
         const toolbar = document.getElementById('toolbar');
         toolbar.innerHTML = '';
@@ -217,7 +272,7 @@
                 const sep = document.createElement('div'); sep.className = 'tool-separator'; toolbar.appendChild(sep); return;
             }
             const btn = document.createElement('button');
-            btn.className = 'tool-btn'; btn.id = `tool-${tool.id}`; btn.dataset.tool = tool.id; btn.title = tool.title; btn.innerHTML = tool.svg;
+            btn.className = 'tool-btn'; btn.id = `tool-${tool.id}`; btn.dataset.tool = tool.id; btn.title = tool.title; btn.innerHTML = tool.icon;
             toolbar.appendChild(btn);
         });
         updateToolButtons();
@@ -233,26 +288,44 @@
     
     window.onload = () => {
         const data = sessionStorage.getItem('editData');
-        if (!data) { document.body.innerHTML = '<h1 style="color:white;text-align:center;margin-top:50px">Error: No edit data found.</h1>'; return; }
+        if (!data) { 
+            console.log("No session data, initializing demo canvas (16x16)");
+            setupCanvas(16, 16);
+            return;
+        }
+
         state.editData = JSON.parse(data);
         const img = new Image();
         img.onload = () => {
-            canvas.width = img.width; canvas.height = img.height;
+            setupCanvas(img.width, img.height);
             ctx.drawImage(img, 0, 0);
-            const wrapperSize = document.getElementById('canvas-grid-wrapper').offsetWidth;
-            const gridSize = wrapperSize / canvas.width;
-            if (canvas.width <= 64) {
-                 gridOverlay.style.backgroundSize = `${gridSize}px ${gridSize}px`;
-                 gridOverlay.style.display = 'block';
-            }
             saveHistory();
-            renderPaletteSwatches();
         };
         img.src = state.editData.imageData;
+        
         createToolbar();
+        renderPaletteSwatches();
         addEventListeners();
         initColorPicker();
     };
+
+    function setupCanvas(width, height) {
+        canvas.width = width;
+        canvas.height = height;
+
+        const wrapperWidth = gridWrapper.offsetWidth; // Misal 512px
+        const pixelScale = wrapperWidth / width;      // Misal 512 / 16 = 32px per pixel
+
+        gridWrapper.style.setProperty('--pixel-scale', `${pixelScale}px`);
+
+        if (pixelScale >= 10) {
+            gridOverlay.style.display = 'block';
+        } else {
+            gridOverlay.style.display = 'none';
+        }
+
+        saveHistory();
+    }
 
     function getCanvasCoords(e) {
         let event = e;
@@ -278,10 +351,13 @@
         state.isDrawing = true;
         const pos = getCanvasCoords(e);
         handleDrawing(pos.x, pos.y);
+
         if (e.type === 'mousedown') {
-            window.addEventListener('mousemove', onDrawMove); window.addEventListener('mouseup', onDrawEnd);
+            window.addEventListener('mousemove', onDrawMove);
+            window.addEventListener('mouseup', onDrawEnd);
         } else {
-            window.addEventListener('touchmove', onDrawMove, { passive: false }); window.addEventListener('touchend', onDrawEnd);
+            window.addEventListener('touchmove', onDrawMove, { passive: false });
+            window.addEventListener('touchend', onDrawEnd);
         }
     }
     function onDrawMove(e) {
@@ -291,10 +367,15 @@
         handleDrawing(pos.x, pos.y);
     }
     function onDrawEnd() {
-        if (state.isDrawing) { saveHistory(); addRecentColor(state.currentColor); }
+        if (state.isDrawing) {
+            saveHistory();
+            addRecentColor(state.currentColor);
+        }
         state.isDrawing = false;
-        window.removeEventListener('mousemove', onDrawMove); window.removeEventListener('mouseup', onDrawEnd);
-        window.removeEventListener('touchmove', onDrawMove); window.removeEventListener('touchend', onDrawEnd);
+        window.removeEventListener('mousemove', onDrawMove);
+        window.removeEventListener('mouseup', onDrawEnd);
+        window.removeEventListener('touchmove', onDrawMove);
+        window.removeEventListener('touchend', onDrawEnd);
     }
     function onKeyDown(e) {
         if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); }
@@ -302,8 +383,10 @@
         const keyMap = { 'p': 'pencil', 'i': 'picker', 'e': 'eraser', 'b': 'bucket', 'c': 'palette' };
         if (document.activeElement.tagName === 'INPUT') return;
         if (keyMap[e.key]) {
-            e.preventDefault(); const tool = keyMap[e.key];
-            if (tool === 'palette') { toggleColorPicker(); } else { state.activeTool = tool; }
+            e.preventDefault();
+            const tool = keyMap[e.key];
+            if (tool === 'palette') { toggleColorPicker(); }
+            else { state.activeTool = tool; }
             updateToolButtons();
         }
     }
@@ -327,8 +410,10 @@
                 if (!state.isDrawing) return;
                 const pixel = ctx.getImageData(x, y, 1, 1).data;
                 const rgba = `rgba(${pixel[0]}, ${pixel[1]}, ${pixel[2]}, ${pixel[3] / 255})`;
-                state.currentColor = rgba; addRecentColor(rgba);
-                updateColorPicker(rgbaToHsv(pixel[0], pixel[1], pixel[2], pixel[3])); state.isDrawing = false;
+                state.currentColor = rgba; 
+                addRecentColor(rgba);
+                updateColorPicker(rgbaToHsv(pixel[0], pixel[1], pixel[2], pixel[3])); 
+                state.isDrawing = false;
                 break;
             case 'bucket':
                 if (state.isDrawing) { floodFill(x, y, parseRgba(state.currentColor)); state.isDrawing = false; } break;
@@ -362,25 +447,30 @@
     function undo() {
         if (state.history.length <= 1) return;
         state.redoStack.push(state.history.pop());
-        ctx.putImageData(state.history[state.history.length - 1], 0, 0); updateToolButtons();
+        const lastState = state.history[state.history.length - 1];
+        ctx.putImageData(lastState, 0, 0); updateToolButtons();
     }
     function redo() {
         if (state.redoStack.length === 0) return;
         const nextState = state.redoStack.pop();
         state.history.push(nextState); ctx.putImageData(nextState, 0, 0); updateToolButtons();
     }
+
     function saveAndReturn() {
-        const editedGlyphs = JSON.parse(localStorage.getItem('editedGlyphs')) || {};
-        const tileKey = `${state.editData.row}-${state.editData.col}`;
-        editedGlyphs[tileKey] = canvas.toDataURL();
-        localStorage.setItem('editedGlyphs', JSON.stringify(editedGlyphs));
+        if (state.editData) {
+            const editedGlyphs = JSON.parse(localStorage.getItem('editedGlyphs')) || {};
+            const tileKey = `${state.editData.row}-${state.editData.col}`;
+            editedGlyphs[tileKey] = canvas.toDataURL();
+            localStorage.setItem('editedGlyphs', JSON.stringify(editedGlyphs));
+        }
         window.location.href = 'index.html';
     }
+
     function addRecentColor(color) {
         let recentColors = JSON.parse(localStorage.getItem('recentColors')) || [];
         recentColors = recentColors.filter(c => c !== color);
         recentColors.unshift(color);
-        if (recentColors.length > 14) { recentColors = recentColors.slice(0, 14); }
+        if (recentColors.length > 10) { recentColors = recentColors.slice(0, 10); }
         localStorage.setItem('recentColors', JSON.stringify(recentColors));
         renderPaletteSwatches();
     }
@@ -388,10 +478,14 @@
         const recentColors = JSON.parse(localStorage.getItem('recentColors')) || [];
         paletteSwatchesContainer.innerHTML = '';
         recentColors.forEach(color => {
-            const swatch = document.createElement('button'); swatch.className = 'swatch-btn'; swatch.style.backgroundColor = color;
+            const swatch = document.createElement('button');
+            swatch.className = 'swatch-btn';
+            swatch.style.backgroundColor = color;
             swatch.addEventListener('click', () => {
-                state.currentColor = color; addRecentColor(color);
-                const rgba = parseRgba(color); updateColorPicker(rgbaToHsv(rgba[0], rgba[1], rgba[2], rgba[3]));
+                state.currentColor = color;
+                addRecentColor(color);
+                const rgba = parseRgba(color);
+                updateColorPicker(rgbaToHsv(rgba[0], rgba[1], rgba[2], rgba[3]));
             });
             paletteSwatchesContainer.appendChild(swatch);
         });
@@ -399,6 +493,8 @@
 
     const cp = {
         modal: document.getElementById('color-picker-modal'),
+        content: document.querySelector('.color-picker-content'),
+        header: document.getElementById('color-picker-header'),
         svPanel: document.getElementById('sv-panel'), svPicker: document.getElementById('sv-picker'),
         hueSlider: document.getElementById('hue-slider'), hueThumb: document.getElementById('hue-thumb'),
         alphaSlider: document.getElementById('alpha-slider'), alphaThumb: document.getElementById('alpha-thumb'),
@@ -410,10 +506,35 @@
     };
     function initColorPicker() {
         document.getElementById('close-color-picker').addEventListener('click', toggleColorPicker);
+        let isDragging = false; let offsetX, offsetY;
+        
+        const onDragStart = (e) => {
+            let event = e.touches ? e.touches[0] : e;
+            isDragging = true;
+            const rect = cp.content.getBoundingClientRect();
+            offsetX = event.clientX - rect.left;
+            offsetY = event.clientY - rect.top;
+        };
+        const onDragMove = (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            let event = e.touches ? e.touches[0] : e;
+            cp.content.style.left = `${event.clientX - offsetX}px`;
+            cp.content.style.top = `${event.clientY - offsetY}px`;
+        };
+        const onDragEnd = () => { isDragging = false; };
+        
+        cp.header.addEventListener('mousedown', onDragStart);
+        window.addEventListener('mousemove', onDragMove);
+        window.addEventListener('mouseup', onDragEnd);
+        cp.header.addEventListener('touchstart', onDragStart, { passive: false });
+        window.addEventListener('touchmove', onDragMove, { passive: false });
+        window.addEventListener('touchend', onDragEnd);
+        
         const sliders = [ { el: cp.svPanel, handler: handleSvDrag }, { el: cp.hueSlider, handler: handleHueDrag }, { el: cp.alphaSlider, handler: handleAlphaDrag } ];
         sliders.forEach(s => {
             const sliderStart = (e) => { e.preventDefault(); s.handler(e);
-                const sliderMove = (me) => s.handler(me);
+                const sliderMove = (moveEvent) => s.handler(moveEvent);
                 const sliderEnd = () => {
                     window.removeEventListener('mousemove', sliderMove); window.removeEventListener('mouseup', sliderEnd);
                     window.removeEventListener('touchmove', sliderMove); window.removeEventListener('touchend', sliderEnd);
@@ -428,9 +549,12 @@
     function toggleColorPicker() {
         cp.modal.classList.toggle('hidden');
         if (!cp.modal.classList.contains('hidden')) {
+            cp.content.style.position = 'absolute'; cp.content.style.left = '50%'; cp.content.style.top = '50%';
+            cp.content.style.transform = 'translate(-50%, -50%)';
             const rgba = parseRgba(state.currentColor);
             const hsv = rgbaToHsv(rgba[0], rgba[1], rgba[2], rgba[3]);
-            cp.oldColor.style.background = state.currentColor; updateColorPicker(hsv);
+            cp.oldColor.style.background = state.currentColor;
+            updateColorPicker(hsv);
         }
     }
     function updateColorPicker(hsv = null) {
@@ -457,7 +581,7 @@
         const hsv = rgbaToHsv(rgba[0], rgba[1], rgba[2], rgba.length > 3 ? rgba[3] * 255 : 255); updateColorPicker(hsv);
     }
     function colorsMatch(c1, c2) { return c1[0] === c2[0] && c1[1] === c2[1] && c1[2] === c2[2] && c1[3] === c2[3]; }
-    function parseRgba(s) { const arr = s.substring(s.indexOf('(') + 1, s.lastIndexOf(')')).split(','); return [parseInt(arr[0]), parseInt(arr[1]), parseInt(arr[2]), arr[3] ? parseFloat(arr[3]) * 255 : 255]; }
+    function parseRgba(rgbaString) { const arr = rgbaString.substring(rgbaString.indexOf('(') + 1, rgbaString.lastIndexOf(')')).split(','); return [parseInt(arr[0]), parseInt(arr[1]), parseInt(arr[2]), arr[3] ? Math.round(parseFloat(arr[3]) * 255) : 255]; }
     function hsvToRgb(h, s, v) { let r, g, b, i, f, p, q, t; i = Math.floor(h * 6); f = h * 6 - i; p = v * (1 - s); q = v * (1 - f * s); t = v * (1 - (1 - f) * s); switch (i % 6) { case 0: r = v, g = t, b = p; break; case 1: r = q, g = v, b = p; break; case 2: r = p, g = v, b = t; break; case 3: r = p, g = q, b = v; break; case 4: r = t, g = p, b = v; break; case 5: r = v, g = p, b = q; break; } return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) }; }
     function rgbaToHsv(r, g, b, a) { r /= 255, g /= 255, b /= 255; let max = Math.max(r, g, b), min = Math.min(r, g, b), h, s, v = max, d = max - min; s = max == 0 ? 0 : d / max; if (max == min) { h = 0; } else { switch (max) { case r: h = (g - b) / d + (g < b ? 6 : 0); break; case g: h = (b - r) / d + 2; break; case b: h = (r - g) / d + 4; break; } h /= 6; } return { h, s, v, a: a / 255 }; }
     function rgbToHex(r, g, b) { return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase(); }
