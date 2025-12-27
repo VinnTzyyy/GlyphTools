@@ -28,7 +28,9 @@
             touch-action: none;
         }
         
+        /* --- HEADER DENGAN ANIMASI --- */
         .editor-header {
+            /* Gradient Animasi */
             background: linear-gradient(270deg, #8A2BE2, #87CEEB, #6a11cb, #87CEEB);
             background-size: 400% 400%;
             animation: gradientAnimation 12s ease infinite;
@@ -71,6 +73,7 @@
             justify-content: center; align-items: center;
         }
         
+        /* --- KANVAS BACKGROUND PIXEL PERFECT --- */
         .canvas-container {
             padding: 0;
             border: 4px solid #333;
@@ -84,8 +87,11 @@
             position: relative;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
             
+            /* Latar Belakang Checkerboard Dinamis */
+            /* --pixel-scale akan dihitung JS agar pas dengan ukuran pixel gambar */
             background-color: #ffffff; /* Warna Pixel 1 (Putih) */
             
+            /* Pola CSS Conic Gradient untuk membuat kotak-kotak tajam tanpa gambar */
             background-image: conic-gradient(
                 #d0d0d0 90deg,  /* Warna Pixel 2 (Abu) */
                 transparent 90deg 180deg,
@@ -93,10 +99,12 @@
                 transparent 270deg
             );
             
+            /* Ukuran background: 2x skala pixel (karena 1 pola checker = 2x2 pixel) */
             background-size: calc(var(--pixel-scale, 32px) * 2) calc(var(--pixel-scale, 32px) * 2);
             background-position: 0 0;
         }
 
+        /* Overlay Garis Grid (Opsional, muncul jika pixel besar) */
         #canvas-grid-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
@@ -116,6 +124,7 @@
             z-index: 10;
         }
         
+        /* --- TOOLBAR --- */
         .tools-container { align-items: center; }
         .toolbar { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
         .tool-btn {
@@ -128,6 +137,7 @@
         .tool-btn.disabled { opacity: 0.4; cursor: not-allowed; }
         .tool-separator { width: 1px; height: 40px; background: var(--border-color); margin: 5px; }
 
+        /* ICON MASKING (Agar warna ikon bisa diubah lewat CSS) */
         .icon-mask {
             display: inline-block;
             width: 32px; height: 32px;
@@ -140,6 +150,7 @@
         .tool-btn.active .icon-mask { background-color: white; }
         .tool-btn:hover .icon-mask { background-color: #e0e0e0; }
 
+        /* --- ACTIONS & PALETTE --- */
         .actions-and-palette-container { gap: 20px; }
         .palette-swatches {
             display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
@@ -161,6 +172,7 @@
         .action-btn.save { background-image: linear-gradient(135deg, #007bff, #00d4ff); }
         .action-btn.cancel { background-image: linear-gradient(135deg, #dc3545, #ff7851); }
 
+        /* --- COLOR PICKER MODAL --- */
         .color-picker-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); display: flex;
@@ -236,6 +248,7 @@
     </div>
 
 <script>
+    // I. SETUP & STATE MANAGEMENT
     const canvas = document.getElementById('editor-canvas');
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     const gridWrapper = document.getElementById('canvas-grid-wrapper');
@@ -252,6 +265,7 @@
         currentColor: 'rgba(255, 255, 255, 1)',
     };
 
+    // II. TOOLBAR CONFIGURATION (Path gambar diperbaiki ke 'img/')
     const tools = [
         { id: 'pencil', icon: `<span class="icon-mask" style="--icon-url: url('img/pencil.svg');"></span>`, title: 'Pencil (P)' },
         { id: 'picker', icon: `<span class="icon-mask" style="--icon-url: url('img/picker.svg');"></span>`, title: 'Eyedropper (I)' },
@@ -286,9 +300,11 @@
         document.getElementById('tool-redo').classList.toggle('disabled', state.redoStack.length === 0);
     }
     
+    // III. INITIALIZATION & DATA LOADING
     window.onload = () => {
         const data = sessionStorage.getItem('editData');
         if (!data) { 
+            // Demo Mode jika tidak ada data
             console.log("No session data, initializing demo canvas (16x16)");
             setupCanvas(16, 16);
             return;
@@ -310,14 +326,19 @@
     };
 
     function setupCanvas(width, height) {
+        // Set ukuran logis canvas (jumlah pixel gambar)
         canvas.width = width;
         canvas.height = height;
 
+        // --- BACKGROUND LOGIC ---
+        // Hitung ukuran visual 1 pixel di layar
         const wrapperWidth = gridWrapper.offsetWidth; // Misal 512px
         const pixelScale = wrapperWidth / width;      // Misal 512 / 16 = 32px per pixel
 
+        // Set variabel CSS agar background checkerboard sesuai ukuran pixel
         gridWrapper.style.setProperty('--pixel-scale', `${pixelScale}px`);
 
+        // Tampilkan overlay grid hanya jika pixelnya cukup besar (mudah dilihat)
         if (pixelScale >= 10) {
             gridOverlay.style.display = 'block';
         } else {
@@ -327,6 +348,7 @@
         saveHistory();
     }
 
+    // IV. MENGHITUNG KOORDINAT
     function getCanvasCoords(e) {
         let event = e;
         if (e.touches && e.touches.length > 0) { event = e.touches[0]; }
@@ -336,6 +358,7 @@
         return { x: Math.floor(x), y: Math.floor(y) };
     }
 
+    // V. EVENT LISTENERS & INTERACTION
     function addEventListeners() {
         document.getElementById('save-btn').addEventListener('click', saveAndReturn);
         document.getElementById('cancel-btn').addEventListener('click', () => window.location.href = 'index.html');
@@ -401,6 +424,7 @@
         updateToolButtons();
     }
     
+    // VII. TOOL LOGIC
     function handleDrawing(x, y) {
         if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) return;
         switch (state.activeTool) {
@@ -439,6 +463,7 @@
         ctx.putImageData(imageData, 0, 0);
     }
     
+    // VIII. HISTORY
     function saveHistory() {
         if (state.history.length >= state.maxHistory) { state.history.shift(); }
         state.history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
@@ -456,6 +481,7 @@
         state.history.push(nextState); ctx.putImageData(nextState, 0, 0); updateToolButtons();
     }
 
+    // IX. SAVE
     function saveAndReturn() {
         if (state.editData) {
             const editedGlyphs = JSON.parse(localStorage.getItem('editedGlyphs')) || {};
@@ -466,6 +492,7 @@
         window.location.href = 'index.html';
     }
 
+    // X. PALETTE
     function addRecentColor(color) {
         let recentColors = JSON.parse(localStorage.getItem('recentColors')) || [];
         recentColors = recentColors.filter(c => c !== color);
@@ -491,6 +518,7 @@
         });
     }
 
+    // XI. COLOR PICKER
     const cp = {
         modal: document.getElementById('color-picker-modal'),
         content: document.querySelector('.color-picker-content'),
